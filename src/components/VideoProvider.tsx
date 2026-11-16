@@ -1,5 +1,5 @@
 import { COLORS } from "@/lib/theme";
-import { useUser } from "@clerk/clerk-expo";
+import { useUser } from "@clerk/expo";
 import type { Call } from "@stream-io/video-react-native-sdk";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";

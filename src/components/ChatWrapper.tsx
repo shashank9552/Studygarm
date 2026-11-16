@@ -1,6 +1,7 @@
 import { studyBuddyTheme } from "@/lib/theme";
-import { useUser } from "@clerk/clerk-expo";
-import type { UserResource } from "@clerk/types";
+import { useUser } from "@clerk/expo";
+
+type UserResource = NonNullable<ReturnType<typeof useUser>["user"]>;
 import { useEffect, useRef } from "react";
 import { Chat, OverlayProvider, useCreateChatClient } from "stream-chat-expo";
 import { FullScreenLoader } from "./FullScreenLoader";

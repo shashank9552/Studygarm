@@ -1,5 +1,5 @@
-import { ClerkProvider } from "@clerk/clerk-expo";
-import { tokenCache } from "@clerk/clerk-expo/token-cache";
+import { ClerkProvider } from "@clerk/expo";
+import { tokenCache } from "@clerk/expo/token-cache";
 import { Stack } from "expo-router";
 import "../../global.css";
 
@@ -39,7 +39,7 @@ if (Platform.OS !== "web") {
 
 export default function RootLayout() {
   return (
-    <ClerkProvider tokenCache={tokenCache}>
+    <ClerkProvider publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!} tokenCache={tokenCache}>
       <GestureHandlerRootView className="flex-1">
         <ChatWrapper>
           <VideoProvider>
@@ -47,6 +47,7 @@ export default function RootLayout() {
               <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="(auth)" />
                 <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="sso-callback" />
               </Stack>
             </AppProvider>
           </VideoProvider>

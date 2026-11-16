@@ -1,7 +1,7 @@
 import { useAppContext } from "@/contexts/AppProvider";
 import { COLORS } from "@/lib/theme";
 import { getGreetingForHour } from "@/lib/utils";
-import { useUser } from "@clerk/clerk-expo";
+import { useUser } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";

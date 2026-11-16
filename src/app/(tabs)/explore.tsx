@@ -4,7 +4,7 @@ import { useAppContext } from "@/contexts/AppProvider";
 import useStartChat from "@/hooks/useStartChat";
 import useStreamUsers from "@/hooks/useStreamUsers";
 import { COLORS } from "@/lib/theme";
-import { useUser } from "@clerk/clerk-expo";
+import { useUser } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View } from "react-native";

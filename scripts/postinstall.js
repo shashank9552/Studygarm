@@ -88,3 +88,64 @@ if (fs.existsSync(streamSdkCommonCjs)) {
     console.log(`[postinstall] Patched ${streamSdkCommonCjs}`);
   }
 }
+
+
+// 4. URL Polyfill protection for Node.js / SSR / Metro (prevents "URL.parse is not a function" crash)
+const urlPolyfillDirs = [
+  path.join(__dirname, '..', 'node_modules', 'react-native-url-polyfill'),
+  path.join(__dirname, '..', 'node_modules', '@stream-io', 'video-react-native-sdk', 'node_modules', 'react-native-url-polyfill'),
+];
+
+for (const dir of urlPolyfillDirs) {
+  const indexJs = path.join(dir, 'index.js');
+  replaceInFile(
+    indexJs,
+    'export function setupURLPolyfill() {\n  globalThis.REACT_NATIVE_URL_POLYFILL',
+    'export function setupURLPolyfill() {\n  if (typeof process !== "undefined" && process.versions && process.versions.node) return;\n  globalThis.REACT_NATIVE_URL_POLYFILL'
+  );
+
+  const urlJs = path.join(dir, 'js', 'URL.js');
+  replaceInFile(
+    urlJs,
+    'export const URL = whatwgUrl;',
+    'if (typeof whatwgUrl.parse !== "function") {\n  whatwgUrl.parse = function parse(url, base) {\n    try { return new whatwgUrl(url, base); } catch { return null; }\n  };\n}\n\nexport const URL = whatwgUrl;'
+  );
+}
+
+// 5. Prevent Expo CLI crash on Windows when ~/.expo directory has EPERM / restricted permissions
+const expoUserSettingsPaths = [
+  path.join(__dirname, '..', 'node_modules', '@expo', 'cli', 'build', 'src', 'api', 'user', 'UserSettings.js'),
+  path.join(__dirname, '..', 'node_modules', 'expo', 'node_modules', '@expo', 'cli', 'build', 'src', 'api', 'user', 'UserSettings.js'),
+];
+
+for (const expoUserSettings of expoUserSettingsPaths) {
+  if (fs.existsSync(expoUserSettings)) {
+    replaceInFile(
+      expoUserSettings,
+      'function getAnonymousId() {\n    const settings = getSettings();\n    let id = settings.get(\'uuid\', null);\n    if (!id) {\n        id = _crypto().default.randomUUID();\n        settings.set(\'uuid\', id);\n    }\n    return id;\n}',
+      'function getAnonymousId() {\n    try {\n        const settings = getSettings();\n        let id = settings.get(\'uuid\', null);\n        if (!id) {\n            id = _crypto().default.randomUUID();\n            try { settings.set(\'uuid\', id); } catch {}\n        }\n        return id;\n    } catch {\n        return _crypto().default.randomUUID();\n    }\n}'
+    );
+  }
+}
+
+// 6. Ensure Foojay toolchain resolver in @react-native/gradle-plugin is 1.0.0 (prevents Gradle 9 / IBM_SEMERU crash)
+const foojayKts = path.join(
+  __dirname,
+  '..',
+  'node_modules',
+  '@react-native',
+  'gradle-plugin',
+  'settings.gradle.kts'
+);
+if (fs.existsSync(foojayKts)) {
+  replaceInFile(
+    foojayKts,
+    'plugins { id("org.gradle.toolchains.foojay-resolver-convention").version("0.5.0") }',
+    'plugins { id("org.gradle.toolchains.foojay-resolver-convention").version("1.0.0") }'
+  );
+  replaceInFile(
+    foojayKts,
+    'plugins { id("org.gradle.toolchains.foojay-resolver-convention").version("0.8.0") }',
+    'plugins { id("org.gradle.toolchains.foojay-resolver-convention").version("1.0.0") }'
+  );
+}
