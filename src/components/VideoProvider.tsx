@@ -14,8 +14,8 @@ let RingingCallContent: any = null;
 // we require it inside try-catch so the app keeps working when the SDK isn’t there.
 // i.e. in Expo Go this is not available - so instead of crashing, we just don't show the video features.
 try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const sdk = require("@stream-io/video-react-native-sdk");
-  StreamVideo = sdk.StreamVideo;
   StreamVideo = sdk.StreamVideo;
   StreamVideoClient = sdk.StreamVideoClient;
   useCalls = sdk.useCalls;
@@ -73,6 +73,7 @@ const VideoProvider = ({ children }: { children: React.ReactNode }) => {
       tokenProvider,
     });
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVideoClient(client);
 
     // cleanup aka better performance
